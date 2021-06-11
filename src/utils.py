@@ -404,11 +404,12 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
         if isinstance(options, bool):
             return False
 
-        options = sorted(options,
-                         key=lambda k: (k['district'].lower(), k['pincode'],
-                                        k['name'].lower(),
-                                        datetime.datetime.strptime(k['date'], "%d-%m-%Y"))
-                         )
+        options = sorted(options, key=lambda k: k['available'],reverse=True)
+        # options = sorted(options,
+        #                  key=lambda k: (k['district'].lower(), k['pincode'],
+        #                                 k['name'].lower(),
+        #                                 datetime.datetime.strptime(k['date'], "%d-%m-%Y"))
+        #                  )
 
         tmp_options = copy.deepcopy(options)
         if len(tmp_options) > 0:
