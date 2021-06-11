@@ -3,14 +3,21 @@ import json
 import os
 import re
 import sys
+from svglib.svglib import svg2rlg
 
 from bs4 import BeautifulSoup
 
 
 def captcha_builder_auto(resp):
+    
+    with open('captcha.svg', 'w') as f:
+        f.write(re.sub('(<path d=)(.*?)(fill=\"none\"/>)', '', resp['captcha']))
+    print('******************************HHELLO WORLD*********************************************')
+    drawing = svg2rlg('captcha.svg')
+    path = os.getcwd()
     with open('captcha.svg','r') as svg_data:
         #model = open(os.path.join(os.path.dirname(sys.argv[0]), "model.txt")).read()
-        model = open("model.txt").read()
+        model = open(path+'/src/model.txt').read()
         #svg_data = resp["captcha"]
         #svg_data = 
         soup = BeautifulSoup(svg_data, "html.parser")

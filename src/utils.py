@@ -334,7 +334,11 @@ def book_appointment(request_header, details,flag):
         while valid_captcha:
             resp = requests.post(CAPTCHA_URL, headers=request_header)
             if flag:
-                captcha = captcha_builder_auto(resp)
+                captcha = captcha_builder_auto(resp.json())
+                print("auto detected captcha = ",captcha)
+                with open('file.txt','w') as f:
+                    f.write(captcha)
+                #captcha = generate_captcha(resp)
             else:
                 captcha = generate_captcha(resp)
             details['captcha'] = captcha
@@ -344,10 +348,10 @@ def book_appointment(request_header, details,flag):
             resp = requests.post(BOOKING_URL, headers=request_header, json=details)
             print(f'Booking Response Code: {resp.status_code}')
             print(f'Booking Response : {resp.text}')
+            flag = False
 
             if resp.status_code == 401:
                 print('TOKEN INVALID')
-                flag = False
                 return False
 
             elif resp.status_code == 200:
