@@ -3,6 +3,7 @@ from hashlib import sha256
 from inputimeout import inputimeout, TimeoutOccurred
 import tabulate, copy, time, datetime, requests, sys, os, random
 from captcha import captcha_builder
+from captchaReader import captcha_builder_auto
 
 BOOKING_URL = "https://cdn-api.co-vin.in/api/v2/appointment/schedule"
 BENEFICIARIES_URL = "https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries"
@@ -312,16 +313,16 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
 
 
-def generate_captcha(request_header):
+def generate_captcha(resp):
     print('================================= GETTING CAPTCHA ==================================================')
-    resp = requests.post(CAPTCHA_URL, headers=request_header)
+    #resp = requests.post(CAPTCHA_URL, headers=request_header)
     print(f'Captcha Response Code: {resp.status_code}')
 
     if resp.status_code == 200:
         return captcha_builder(resp.json())
 
 
-def book_appointment(request_header, details):
+def book_appointment(request_header, details,flag):
     """
     This function
         1. Takes details in json format
@@ -331,7 +332,11 @@ def book_appointment(request_header, details):
     try:
         valid_captcha = True
         while valid_captcha:
-            captcha = generate_captcha(request_header)
+            resp = requests.post(CAPTCHA_URL, headers=request_header)
+            if flag:
+                captcha = captcha_builder_auto(resp)
+            else:
+                captcha = generate_captcha(resp)
             details['captcha'] = captcha
 
             print('================================= ATTEMPTING BOOKING ==================================================')
@@ -342,6 +347,7 @@ def book_appointment(request_header, details):
 
             if resp.status_code == 401:
                 print('TOKEN INVALID')
+                flag = False
                 return False
 
             elif resp.status_code == 200:
@@ -367,7 +373,7 @@ def book_appointment(request_header, details):
         beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
 
 
-def check_and_book(request_header, beneficiary_dtls, location_dtls, search_option, **kwargs):
+def check_and_book(request_header, beneficiary_dtls, location_dtls, search_option, flag, **kwargs):
     """
     This function
         1. Checks the vaccination calendar for available slots,
@@ -422,12 +428,16 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
             if auto_book == 'yes-please':
                 print("AUTO-BOOKING IS ENABLED. PROCEEDING WITH FIRST CENTRE, DATE, and RANDOM SLOT.")
                 option = options[0]
-                random_slot = random.randint(1, len(option['slots']))
-                choice = f'1.{random_slot}'
+                print('******************Print command by Shabs***********************')
+                print(option)
+                #random_slot = random.randint(1, len(option['slots']))
+                #choice = f'1.{random_slot}'
+                choice = f'1.3'
             else:
-                choice = inputimeout(
-                    prompt='----------> Wait 20 seconds for updated options OR \n----------> Enter a choice e.g: 1.4 for (1st center 4th slot): ',
-                    timeout=20)
+                choice  = f'1.3'
+                #choice = inputimeout(
+                    #prompt='----------> Wait 20 seconds for updated options OR \n----------> Enter a choice e.g: 1.4 for (1st center 4th slot): ',
+                    #timeout=20)
 
         else:
             for i in range(refresh_freq, 0, -1):
@@ -459,7 +469,7 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
                 }
 
                 print(f'Booking with info: {new_req}')
-                return book_appointment(request_header, new_req)
+                return book_appointment(request_header, new_req,flag)
 
             except IndexError:
                 print("============> Invalid Option!")
