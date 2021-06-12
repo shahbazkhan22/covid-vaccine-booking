@@ -75,13 +75,13 @@ def main():
             request_header["Authorization"] = f"Bearer {token}"
 
             # call function to check and book slots
-            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option,
+            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option, flag=True,
                                          min_slots=info.minimum_slots,
                                          ref_freq=info.refresh_freq,
                                          auto_book=info.auto_book,
                                          start_date=info.start_date,
                                          vaccine_type=info.vaccine_type,
-                                         fee_type=info.fee_type)
+                                         fee_type=info.fee_type,)
 
             # check if token is still valid
             beneficiaries_list = requests.get(BENEFICIARIES_URL, headers=request_header)
