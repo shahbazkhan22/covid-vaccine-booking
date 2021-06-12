@@ -10,6 +10,7 @@ from utils import generate_token_OTP, check_and_book, beep, BENEFICIARIES_URL, W
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--token', help='Pass token directly')
+    parser.add_argument('--mobile', help='Pass mobile directly')
     args = parser.parse_args()
 
     filename = 'vaccine-booking-details.json'
@@ -21,12 +22,18 @@ def main():
     try:
         base_request_header = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+            'origin': 'https://selfregistration.cowin.gov.in/',
+            'referer': 'https://selfregistration.cowin.gov.in/'
         }
 
         if args.token:
             token = args.token
         else:
-            mobile = input("Enter the registered mobile number: ")
+            mobile = ''
+            if args.mobile:
+                mobile = args.mobile
+            else:
+                mobile = input("Enter the registered mobile number: ")
             token = generate_token_OTP(mobile, base_request_header)
 
         request_header = copy.deepcopy(base_request_header)

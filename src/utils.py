@@ -414,11 +414,12 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
         if isinstance(options, bool):
             return False
 
-        options = sorted(options,
-                         key=lambda k: (k['district'].lower(), k['pincode'],
-                                        k['name'].lower(),
-                                        datetime.datetime.strptime(k['date'], "%d-%m-%Y"))
-                         )
+        options = sorted(options, key=lambda k: k['available'],reverse=True)
+        # options = sorted(options,
+        #                  key=lambda k: (k['district'].lower(), k['pincode'],
+        #                                 k['name'].lower(),
+        #                                 datetime.datetime.strptime(k['date'], "%d-%m-%Y"))
+        #                  )
 
         tmp_options = copy.deepcopy(options)
         if len(tmp_options) > 0:
@@ -444,11 +445,14 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
                     #timeout=20)
 
         else:
-            for i in range(refresh_freq, 0, -1):
-                msg = f"No viable options. Next update in {i} seconds.."
-                print(msg, end="\r", flush=True)
-                sys.stdout.flush()
-                time.sleep(1)
+            try:
+                for i in range(refresh_freq, 0, -1):
+                    msg = f"No viable options. Next update in {i} seconds. OR press 'Ctrl + C' to refresh now."
+                    print(msg, end="\r", flush=True)
+                    sys.stdout.flush()
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                pass
             choice = '.'
 
     except TimeoutOccurred:
