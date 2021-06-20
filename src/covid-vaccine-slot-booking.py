@@ -3,10 +3,15 @@
 import copy
 from types import SimpleNamespace
 import requests, sys, argparse, os, datetime
-from utils import generate_token_OTP, check_and_book, beep, BENEFICIARIES_URL, WARNING_BEEP_DURATION, \
-    display_info_dict, save_user_info, collect_user_details, get_saved_user_info, confirm_and_proceed
+from OTPlogin import OtpLogin
+from utils import check_and_book, beep, BENEFICIARIES_URL, WARNING_BEEP_DURATION, \
+    display_info_dict, save_user_info, collect_user_details, get_saved_user_info, confirm_and_proceed, generate_token
 
-
+base_request_header = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+            'origin': 'https://selfregistration.cowin.gov.in/',
+            'referer': 'https://selfregistration.cowin.gov.in/'
+            }
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--token', help='Pass token directly')
@@ -20,21 +25,26 @@ def main():
     beep(500, 150)
 
     try:
-        base_request_header = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
-            'origin': 'https://selfregistration.cowin.gov.in/',
-            'referer': 'https://selfregistration.cowin.gov.in/'
-        }
+        OtpLogin()
+        token = generate_token(base_request_header)
+        # with open('otp.txt','r') as file:
+        #     file.read()
+        
+    #     base_request_header = {
+    #         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+    #         'origin': 'https://selfregistration.cowin.gov.in/',
+    #         'referer': 'https://selfregistration.cowin.gov.in/'
+    #     }
 
-        if args.token:
-            token = args.token
-        else:
-            mobile = ''
-            if args.mobile:
-                mobile = args.mobile
-            else:
-                mobile = input("Enter the registered mobile number: ")
-            token = generate_token_OTP(mobile, base_request_header)
+    #     if args.token:
+    #         token = args.token
+    #     else:
+    #         mobile = ''
+    #         if args.mobile:
+    #             mobile = args.mobile
+    #         else:
+    #             mobile = input("Enter the registered mobile number: ")
+    #         token = generate_token_OTP(mobile, base_request_header)
 
         request_header = copy.deepcopy(base_request_header)
         request_header["Authorization"] = f"Bearer {token}"
@@ -75,13 +85,13 @@ def main():
             request_header["Authorization"] = f"Bearer {token}"
 
             # call function to check and book slots
-            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option, flag=True,
+            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option,
                                          min_slots=info.minimum_slots,
                                          ref_freq=info.refresh_freq,
                                          auto_book=info.auto_book,
                                          start_date=info.start_date,
                                          vaccine_type=info.vaccine_type,
-                                         fee_type=info.fee_type,)
+                                         fee_type=info.fee_type)
 
             # check if token is still valid
             beneficiaries_list = requests.get(BENEFICIARIES_URL, headers=request_header)
