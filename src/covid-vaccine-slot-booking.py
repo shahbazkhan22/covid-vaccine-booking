@@ -50,10 +50,11 @@ def main():
         request_header["Authorization"] = f"Bearer {token}"
 
         if os.path.exists(filename):
-            print("\n=================================== Note ===================================\n")
-            print(f"Info from perhaps a previous run already exists in {filename} in this directory.")
-            print(f"IMPORTANT: If this is your first time running this version of the application, DO NOT USE THE FILE!")
-            try_file = input("Would you like to see the details and confirm to proceed? (y/n Default y): ")
+            #print("\n=================================== Note ===================================\n")
+            #print(f"Info from perhaps a previous run already exists in {filename} in this directory.")
+            #print(f"IMPORTANT: If this is your first time running this version of the application, DO NOT USE THE FILE!")
+            #try_file = input("Would you like to see the details and confirm to proceed? (y/n Default y): ")
+            try_file = 'n'
             try_file = try_file if try_file else 'y'
 
             if try_file == 'y':
@@ -85,7 +86,7 @@ def main():
             request_header["Authorization"] = f"Bearer {token}"
 
             # call function to check and book slots
-            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option,
+            token_valid = check_and_book(request_header, info.beneficiary_dtls, info.location_dtls, info.search_option,flag=True,
                                          min_slots=info.minimum_slots,
                                          ref_freq=info.refresh_freq,
                                          auto_book=info.auto_book,
