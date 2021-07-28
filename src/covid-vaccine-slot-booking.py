@@ -66,16 +66,22 @@ def main():
                 file_acceptable = file_acceptable if file_acceptable else 'n'
 
                 if file_acceptable != 'y':
+                    #print("REhoo")
                     collected_details = collect_user_details(request_header)
-                    save_user_info(filename, collected_details)
+                    #print("Hello",collected_details)
+                    #save_user_info(filename, collected_details)
 
             else:
+                #print("Rehooo")
                 collected_details = collect_user_details(request_header)
-                save_user_info(filename, collected_details)
+                #print("Hey",collected_details)
+                #save_user_info(filename, collected_details)
 
         else:
+            #print("hooooo")
             collected_details = collect_user_details(request_header)
-            save_user_info(filename, collected_details)
+            #print("Hoo",collected_details)
+            #save_user_info(filename, collected_details)
             confirm_and_proceed(collected_details)
 
         info = SimpleNamespace(**collected_details)
