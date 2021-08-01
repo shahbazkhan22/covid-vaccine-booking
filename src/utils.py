@@ -2,6 +2,7 @@ import json
 from hashlib import sha256
 from inputimeout import inputimeout, TimeoutOccurred
 import tabulate, copy, time, datetime, requests, sys, os, random
+from Pincode import getPincodes
 from captcha import captcha_builder
 from Selectusername import selectUser
 from captchaReader import captcha_builder_auto
@@ -215,8 +216,8 @@ def collect_user_details(request_header):
     # Get preference of Free/Paid option
     fee_type = get_fee_type_preference()
 
-    print("\n=========== CAUTION! =========== CAUTION! CAUTION! =============== CAUTION! =======\n")
-    print("===== BE CAREFUL WITH THIS OPTION! AUTO-BOOKING WILL BOOK THE FIRST AVAILABLE CENTRE, DATE, AND A RANDOM SLOT! =====")
+    #print("\n=========== CAUTION! =========== CAUTION! CAUTION! =============== CAUTION! =======\n")
+    #print("===== BE CAREFUL WITH THIS OPTION! AUTO-BOOKING WILL BOOK THE FIRST AVAILABLE CENTRE, DATE, AND A RANDOM SLOT! =====")
     #auto_book = input("Do you want to enable auto-booking? (yes-please or no) Default no: ")
     #auto_book = 'no' if not auto_book else auto_book
     auto_book = 'yes-please'
@@ -232,7 +233,7 @@ def collect_user_details(request_header):
         'vaccine_type': vaccine_type,
         'fee_type': fee_type
     }
-
+    print("IM here",collected_details)
     return collected_details
 
 
@@ -524,9 +525,10 @@ def get_fee_type_preference():
 
 
 def get_pincodes():
+    pincodes = getPincodes()
     locations = []
-    pincodes = input("Enter comma separated pincodes to monitor: ")
-    for idx, pincode in enumerate(pincodes.split(',')):
+    #pincodes = input("Enter comma separated pincodes to monitor: ")
+    for idx, pincode in enumerate(pincodes):
         pincode = {
             'pincode': pincode,
             'alert_freq': 440 + ((2 * idx) * 110)

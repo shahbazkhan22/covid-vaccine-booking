@@ -43,5 +43,5 @@ def selectPinDis():
     window.geometry("300x200")
     obj = SelectChoice(window)
     window.mainloop()
-    print(SelectChoice.returnValue(obj))
+    return SelectChoice.returnValue(obj)
     #print(value)
